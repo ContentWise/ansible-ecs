@@ -8,6 +8,7 @@
     ecs_cluster:
       name: "{{ ecs_cluster_name }}"
       state: "{{ ecs_state }}"
+      region: "{{ ec2_region }}"
     register: ecs_cluster
 
   - debug: var=ecs_cluster verbosity=4
@@ -26,6 +27,8 @@
       instance_profile_name: "{{ ecs_instance_profile_name }}"
       assign_public_ip: "{{ ec2_assign_public_ip }}"
       user_data: "{{ ec2_userdata }}"
+      region: "{{ ec2_region }}"
+      volumes: "{{ ec2_volumes }}"
     register: ec2_lc
 
   - debug: var=ec2_lc verbosity=4
@@ -47,6 +50,7 @@
       vpc_zone_identifier: "{{ ec2_asg_vpc_subnets }}"
       tags: "{{ ec2_asg_tags }}"
       wait_for_instances: "{{ ec2_asg_wait }}"
+      region: "{{ ec2_region }}"
     register: ec2_asg
 
   - debug: var=ec2_asg verbosity=4
@@ -61,17 +65,20 @@
       name: "{{ ec2_asg_name }}"
       state: "absent"
       wait_for_instances: "{{ ec2_asg_wait }}"
+      region: "{{ ec2_region }}"
 
   # Decommision the EC2 Launch Configuration
   - name: "AWS | EC2 | Decomission the EC2 Launch Configuration"
     ec2_lc:
       name: "{{ ec2_launch_configuration_name }}"
       state: "absent"
+      region: "{{ ec2_region }}"
 
   # Decomission the ECS cluster
   - name: "AWS | ECS | Decommission the cluster"
     ecs_cluster:
       name: "{{ ecs_cluster_name }}"
       state: "absent"
+      region: "{{ ec2_region }}"
 
   when: ecs_state == "absent"
